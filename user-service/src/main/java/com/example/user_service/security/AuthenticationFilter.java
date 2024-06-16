@@ -4,6 +4,7 @@ import com.example.user_service.dto.UserDto;
 import com.example.user_service.service.UserService;
 import com.example.user_service.vo.RequestLogin;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.FilterChain;
@@ -30,6 +31,8 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     private final UserService userService;
     private final Environment env;
     private final byte[] secretKey;
+
+    public final static Long TOKEN_EXPIRE_COUNT = 1 * 24 * 60 * 60 * 1000L;// 1 days
 
     public AuthenticationFilter (UserService userService, Environment env) {
         this.userService = userService;
@@ -63,9 +66,15 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
             String username = ((User)authResult.getPrincipal()).getUsername();
             UserDto userDetails = userService.getUserDetailsByEmail(username);
 
+            Claims claims = Jwts.claims();
+            claims.put("name", userDetails.getName());
+            claims.put("id", userDetails.getUserId());
+
             String token = Jwts.builder()
+                    .setClaims(claims)
                     .setSubject(userDetails.getUserId())
-                    .setExpiration(new Date(System.currentTimeMillis() + Long.parseLong(env.getProperty("token.expiration_time"))))
+                    .setIssuedAt(new Date())
+                    .setExpiration(new Date(new Date().getTime() + TOKEN_EXPIRE_COUNT))
                     .signWith(getSigningKey(secretKey))
                     .compact();
 
