@@ -47,17 +47,20 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
 
             String authorizationHeader = request.getHeaders().get(HttpHeaders.AUTHORIZATION).get(0);
             String jwt = authorizationHeader.replace("Bearer ","");
-            
-            if (!isJwtValid(jwt)) {
+            String subject = extractSubject(jwt);
+            if (subject == null || subject.isEmpty()) {
                 log.error("Missing or invalid Authorization header");
                 return Mono.error(new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Missing or invalid Authorization header"));
             }
+            ServerHttpRequest modifiedRequest = request.mutate()
+                    .header("userId", subject)
+                    .build();
 
-            return chain.filter(exchange);
+            ServerWebExchange modifiedExchange = exchange.mutate().request(modifiedRequest).build();
+            return chain.filter(modifiedExchange);
         };
     }
-    private boolean isJwtValid(String jwt) {
-        boolean returnValue = true;
+    private String extractSubject(String jwt) {
         String subject = null;
 
         try {
@@ -67,15 +70,9 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
                     .parseClaimsJws(jwt).getBody()
                     .getSubject();
         } catch (Exception ex) {
-            returnValue = false;
+            subject = null;
         }
-
-        if (subject == null || subject.isEmpty()) {
-            returnValue = false;
-        }
-
-
-        return returnValue;
+        return subject;
     }
 
     private static Key getSigningKey(byte[] secretKey) {

@@ -27,8 +27,8 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/welcome")
-    public ApiResult<String> welcome() {
-        return success("welcome");
+    public ApiResult<String> welcome(@RequestHeader("userId") String userId) {
+        return success(userId);
     }
 
     @PostMapping("/users")
