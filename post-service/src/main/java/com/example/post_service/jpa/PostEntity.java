@@ -12,10 +12,10 @@ public class PostEntity {
     private Long id;
 
     @Column(nullable = false, unique = true)
-    private Long postId;
+    private String postId;
 
     @Column(nullable = false)
-    private Long userId;
+    private String userId;
 
     @Column(nullable = false)
     private String imageName;

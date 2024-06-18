@@ -3,7 +3,6 @@ package com.example.user_service.controller;
 import com.example.user_service.dto.UserDto;
 import com.example.user_service.jpa.UserEntity;
 import com.example.user_service.service.UserService;
-import com.example.user_service.utils.ApiUtils;
 import com.example.user_service.utils.ApiUtils.ApiResult;
 import com.example.user_service.vo.RequestUser;
 import com.example.user_service.vo.ResponseUser;
