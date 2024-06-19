@@ -3,14 +3,12 @@ package com.example.user_service.vo;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
-import java.util.List;
-
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ResponseUser {
-    private String email;
-    private String name;
+public class ResponsePost {
+    private String imageName;
+    private String storedName;
+    private String contents;
+    private String postId;
     private String userId;
-
-    private List<ResponsePost> posts;
 }

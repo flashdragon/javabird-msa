@@ -14,4 +14,6 @@ public interface PostRepository extends CrudRepository<PostEntity, Long> {
     @Query("DELETE FROM PostEntity p WHERE p.postId = :postId AND p.userId = :userId")
     int deleteByPostIdAndUserId(String postId, String userId);
 
+    Iterable<PostEntity> findByUserId(String userId);
+
 }

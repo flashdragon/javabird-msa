@@ -59,4 +59,9 @@ public class PostServiceImpl implements PostService{
         log.info("Post with ID {} deleted successfully", postId);
         return true;
     }
+
+    @Override
+    public Iterable<PostEntity> getPostByUserId(String userId) {
+        return postRepository.findByUserId(userId);
+    }
 }

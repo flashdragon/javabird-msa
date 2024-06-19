@@ -1,5 +1,6 @@
 package com.example.user_service;
 
+import feign.Logger;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
@@ -21,4 +22,8 @@ public class UserServiceApplication {
 		return new BCryptPasswordEncoder();
 	}
 
+	@Bean
+	public Logger.Level feignLoggerLevel() {
+		return Logger.Level.FULL;
+	}
 }

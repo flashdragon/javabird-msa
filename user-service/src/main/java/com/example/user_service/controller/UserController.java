@@ -54,4 +54,11 @@ public class UserController {
         return success(result);
     }
 
+    @GetMapping("/users/{userId}")
+    public ApiResult<ResponseUser> getUser(@PathVariable("userId") String userId) {
+        UserDto userDto = userService.getUserByUserId(userId);
+
+        ResponseUser responseUser = new ModelMapper().map(userDto, ResponseUser.class);
+        return success(responseUser);
+    }
 }

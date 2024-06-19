@@ -13,4 +13,6 @@ public interface PostService {
     PostDto getPostByPostId(String postId);
 
     boolean deleteByPostIdAndUserId(String postId, String userId);
+
+    Iterable<PostEntity> getPostByUserId(String userId);
 }

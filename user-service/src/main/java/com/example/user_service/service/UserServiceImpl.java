@@ -1,23 +1,30 @@
 package com.example.user_service.service;
 
+import com.example.user_service.client.PostServiceClient;
 import com.example.user_service.dto.UserDto;
 import com.example.user_service.jpa.UserEntity;
 import com.example.user_service.jpa.UserRepository;
+import com.example.user_service.utils.ApiUtils;
+import com.example.user_service.vo.ResponsePost;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreaker;
 import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.core.env.Environment;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import com.example.user_service.utils.ApiUtils.ApiResult;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import static com.example.user_service.utils.ApiUtils.success;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +35,7 @@ public class UserServiceImpl implements UserService{
 
     public final BCryptPasswordEncoder passwordEncoder;
 
+    public final PostServiceClient postServiceClient;
 
     public final CircuitBreakerFactory circuitBreakerFactory;
 
@@ -66,6 +74,14 @@ public class UserServiceImpl implements UserService{
             throw new UsernameNotFoundException("User not found");
 
         UserDto userDto = new ModelMapper().map(userEntity, UserDto.class);
+
+        log.info("Before call posts microservice.");
+        CircuitBreaker circuitBreaker = circuitBreakerFactory.create("circuitbreaker");
+        List<ResponsePost> postList = circuitBreaker.run(() -> postServiceClient.getPosts(userId),
+                throwable -> success(new ArrayList<ResponsePost>())).getResponse();
+        log.info("After called posts microservice.");
+
+        userDto.setPosts(postList);
 
         return userDto;
     }

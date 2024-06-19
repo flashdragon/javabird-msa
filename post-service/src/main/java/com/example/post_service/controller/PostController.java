@@ -20,12 +20,12 @@ import static com.example.post_service.utils.ApiUtils.success;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-@RequestMapping("/")
+@RequestMapping("/posts")
 public class PostController {
 
     private final PostService postService;
 
-    @PostMapping("/posts")
+    @PostMapping
     public ApiResult<ResponsePost> createPost(@ModelAttribute RequestPost post, @RequestHeader("userId") String userId) throws IOException {
         log.info("Post /posts");
         ModelMapper mapper = new ModelMapper();
@@ -37,7 +37,7 @@ public class PostController {
         return success(responsePost);
     }
 
-    @GetMapping("/posts")
+    @GetMapping
     public ApiResult<List<ResponsePost>> getPosts() {
         Iterable<PostEntity> postList = postService.getPostByAll();
         List<ResponsePost> result = new ArrayList<>();
@@ -47,7 +47,7 @@ public class PostController {
         return success(result);
     }
 
-    @GetMapping("/posts/{postId}")
+    @GetMapping("/{postId}")
     public ApiResult<ResponsePost> getPost(@PathVariable("postId") String postId) {
         PostDto postDto = postService.getPostByPostId(postId);
         ModelMapper mapper = new ModelMapper();
@@ -56,9 +56,21 @@ public class PostController {
         return success(responsePost);
     }
 
-    @DeleteMapping("/posts/{postId}")
+    @DeleteMapping("/{postId}")
     public ApiResult<Boolean> deletePost(@PathVariable("postId") String postId, @RequestHeader("userId") String userId) {
         return success(postService.deleteByPostIdAndUserId(postId, userId));
     }
+
+    @GetMapping("/users/{userId}")
+    public ApiResult<List<ResponsePost>> getPosts(@PathVariable("userId")String userId) {
+        log.info("GET /users/{userId}");
+        Iterable<PostEntity> postList = postService.getPostByUserId(userId);
+        List<ResponsePost> result = new ArrayList<>();
+        postList.forEach(v -> {
+            result.add(new ModelMapper().map(v, ResponsePost.class));
+        });
+        return success(result);
+    }
+
 
 }
