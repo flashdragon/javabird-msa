@@ -6,11 +6,14 @@ import com.example.user_service.service.UserService;
 import com.example.user_service.utils.ApiUtils.ApiResult;
 import com.example.user_service.vo.RequestUser;
 import com.example.user_service.vo.ResponseUser;
+import jakarta.ws.rs.NotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +21,7 @@ import java.util.List;
 import static com.example.user_service.utils.ApiUtils.success;
 
 @RestController
+@Slf4j
 @RequestMapping("/")
 @RequiredArgsConstructor
 public class UserController {
@@ -29,6 +33,7 @@ public class UserController {
     public ApiResult<String> welcome(@RequestHeader("userId") String userId) {
         return success(userId);
     }
+
 
     @PostMapping("/users")
     public ApiResult<ResponseUser> createUser(@RequestBody RequestUser user) {
@@ -61,4 +66,6 @@ public class UserController {
         ResponseUser responseUser = new ModelMapper().map(userDto, ResponseUser.class);
         return success(responseUser);
     }
+
+
 }

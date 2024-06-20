@@ -3,6 +3,7 @@ package com.example.user_service.security;
 import com.example.user_service.dto.UserDto;
 import com.example.user_service.service.UserService;
 import com.example.user_service.vo.RequestLogin;
+import com.example.user_service.vo.ResponseLogin;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -13,10 +14,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.io.IOException;
@@ -24,6 +27,9 @@ import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.ArrayList;
 import java.util.Date;
+
+import static com.example.user_service.utils.ApiUtils.error;
+import static com.example.user_service.utils.ApiUtils.success;
 
 @Slf4j
 public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
@@ -80,7 +86,19 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
             response.addHeader("token", token);
             response.addHeader("userId", userDetails.getUserId());
+
+            response.setStatus(HttpServletResponse.SC_OK);
+            response.setContentType("application/json");
+            new ObjectMapper().writeValue(response.getOutputStream(), success(new ResponseLogin(token, userDetails.getUserId())));
     }
+
+    @Override
+    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType("application/json");
+        new ObjectMapper().writeValue(response.getOutputStream(), error(new UsernameNotFoundException("User not found."), HttpStatus.UNAUTHORIZED));
+    }
+
     public static Key getSigningKey(byte[] secretKey) {
         return Keys.hmacShaKeyFor(secretKey);
     }
