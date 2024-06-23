@@ -11,4 +11,5 @@ public class PostDto {
     private String postId;
     private String userId;
     private String contents;
+    private int like;
 }

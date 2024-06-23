@@ -24,4 +24,7 @@ public class PostEntity {
     private String storedName;
 
     private String contents;
+
+    @Column(nullable = false)
+    private int likeCount;
 }

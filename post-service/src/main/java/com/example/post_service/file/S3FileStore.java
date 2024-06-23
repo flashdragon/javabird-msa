@@ -35,8 +35,7 @@ public class S3FileStore{
         String originalFilename = multipartFile.getOriginalFilename();
         String storeFileName = createStoreFileName(originalFilename);
         postDto.setImageName(originalFilename);
-        postDto.setStoredName(storeFileName);
-        log.info("Uploading file to S3: {}", storeFileName);
+        log.info("Uploading file to S3: {}", originalFilename);
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentType(multipartFile.getContentType());
         try (InputStream inputStream = multipartFile.getInputStream()) {
@@ -44,6 +43,7 @@ public class S3FileStore{
                     .withCannedAcl(CannedAccessControlList.PublicRead);
             amazonS3Client.putObject(putObjectRequest);
         }
+        postDto.setStoredName(amazonS3Client.getUrl(bucket, storeFileName).toString());
     }
 
     private String createStoreFileName(String originalFilename) {

@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -17,6 +18,7 @@ import java.util.UUID;
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@Transactional
 public class PostServiceImpl implements PostService{
 
     private final PostRepository postRepository;
@@ -29,6 +31,7 @@ public class PostServiceImpl implements PostService{
         ModelMapper mapper = new ModelMapper();
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         PostEntity postEntity = mapper.map(postDto, PostEntity.class);
+        postEntity.setLikeCount(0);
         postRepository.save(postEntity);
 
         return postDto;
@@ -63,5 +66,12 @@ public class PostServiceImpl implements PostService{
     @Override
     public Iterable<PostEntity> getPostByUserId(String userId) {
         return postRepository.findByUserId(userId);
+    }
+
+    @Override
+    public boolean likePost(String postId, String userId) {
+        PostEntity postEntity = postRepository.findByPostId(postId);
+        postEntity.setLikeCount(postEntity.getLikeCount() + 1);
+        return true;
     }
 }

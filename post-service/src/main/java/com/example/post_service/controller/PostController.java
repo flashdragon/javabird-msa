@@ -72,5 +72,11 @@ public class PostController {
         return success(result);
     }
 
+    @PostMapping("/{postId}/like")
+    public ApiResult<Boolean> likePost(@PathVariable("postId") String postId, @RequestHeader("userId") String userId) {
+        return success(postService.likePost(postId, userId));
+    }
+
+
 
 }

@@ -11,4 +11,5 @@ public class ResponsePost {
     private String contents;
     private String postId;
     private String userId;
+    private int like;
 }

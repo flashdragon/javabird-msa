@@ -15,4 +15,6 @@ public interface PostService {
     boolean deleteByPostIdAndUserId(String postId, String userId);
 
     Iterable<PostEntity> getPostByUserId(String userId);
+
+    boolean likePost(String postId, String userId);
 }
